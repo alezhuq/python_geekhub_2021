@@ -2,4 +2,4 @@
 
 input_dec = int(input("input your number to convert :"))
 out_hex = hex(input_dec)
-print(out_hex)
+print(out_hex[2:])
