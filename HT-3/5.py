@@ -1,27 +1,21 @@
 # 5. Користувач вводить змiннi "x" та "y" з довiльними цифровими значеннями;
-#    -  Створiть просту умовну конструкцiю(звiсно вона повинна бути в тiлi ф-цiї),
-#       пiд час виконання якої буде перевiрятися рiвнiсть змiнних "x" та "y"
-#       і при нерiвностi змiнних "х" та "у" вiдповiдь повертали рiзницю чисел.
-#       -  Повиннi опрацювати такi умови:
-#            -  x > y;       вiдповiдь - х бiльше нiж у на z
-#            -  x < y;       вiдповiдь - у бiльше нiж х на z
-#            -  x == y.      вiдповiдь - х дорiвнює z
+# -  Створiть просту умовну конструкцiю(звiсно вона повинна бути в тiлi ф-цiї), пiд час виконання якої буде перевiрятися рiвнiсть змiнних "x" та "y" і при нерiвностi змiнних "х" та "у" вiдповiдь повертали рiзницю чисел.
+# -  Повиннi опрацювати такi умови:
+# -  x > y;       вiдповiдь - х бiльше нiж у на z
+# -  x < y;       вiдповiдь - у бiльше нiж х на z
+# -  x == y.      вiдповiдь - х дорiвнює z
 
 
-def simple_conditional_construction(x, y):
+def simp_construct(x, y):
     if x > y:
-        z = x-y
-        print("Answer : {} (your x) is greater than {} (your y) by {}".format(x, y, z))
+        print("{}(x) > {}(y) by {}".format(x, y, x-y))
 
     elif y > x:
-        z = y-x
-        print("Answer : {} (your y) is greater than {} (your x) by {}".format(y, x, z))
+        print("{}(y) > {}(x) by {}".format(y, x, y-x))
 
     else:
-        print("Answer : {} (your x) is equal to {} (your y)".format(x, y))
+        print("{}(x) = {}(y)".format(x, y))
 
 
-x = float(input("input your x (number) : "))
-y = float(input("input your y (number) : "))
-
-simple_conditional_construction(x, y)
+x, y = str(input("input your values(ex:14, 15)" )).split(sep = ", ")
+simp_construct(int(x), int(y))
