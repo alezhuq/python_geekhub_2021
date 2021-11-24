@@ -2,7 +2,7 @@
 
 
 def my_func(n):
-    for i in range(1, n):
+    for i in range(n):
         if i%17 == 0:
             print(i)
 
