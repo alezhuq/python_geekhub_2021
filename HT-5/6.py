@@ -4,11 +4,24 @@
 #    https://docs.python.org/3/library/stdtypes.html#range
 
 
-def my_cutom_range(number: int):
-    i = 0
-    while i < number:
-        yield i
-        i += 1
+
+def my_cutom_range(*args):
+    if len(args) == 3:
+        start = args[0]
+        end = args[1]
+        step = args[2]
+    elif len(args) == 2:
+        start = args[0]
+        end = args[1]
+        step = 1
+    else:
+        start = 0
+        end = args[0]
+        step = 1
+
+    while start < end:
+        yield start
+        start += step
 
 
 print(type(my_cutom_range(5)))
