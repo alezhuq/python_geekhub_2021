@@ -26,6 +26,6 @@ def my_cutom_range(*args):
 
 print(type(my_cutom_range(5)))
 
-for i in my_cutom_range(5):
+for i in my_cutom_range(1, 5, 2):
     print(i)
 
