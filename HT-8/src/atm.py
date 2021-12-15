@@ -153,9 +153,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
             counter += 1
             if ok:
                 break
-    print(tens, hundreds, thousands)
     if not (tens or hundreds or thousands):
-        print("operation good")
         with open(Path(__file__).parent.parent / "data" / "atm.data", "wt") as atm_nominal:
             atm_nominal.write(json.dumps(nominals))
         return True
@@ -163,7 +161,6 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
         for i in nominals.keys():
             if xcept_dict[i] > 0:
                 nominals[i] += xcept_dict[i]
-        print("i cant do it rn")
         return False
 
 
