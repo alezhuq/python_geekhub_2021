@@ -41,7 +41,7 @@ def validation(username: str, password: str, con, cur):
                 return "worker"
             return "no"
 
-# REDO
+
 def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
     temp_value = value
     thousands = (temp_value // 1000) * 1000
