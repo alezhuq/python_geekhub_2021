@@ -69,6 +69,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
     tens = (temp_value // 10) * 10
     ones = temp_value - tens
     xcept_dict = {i: 0 for i in nominals.keys()}
+    final_dict = {i: 0 for i in nominals.keys()}
     # ex : 367
     if ones:
         print("i can't do this")
@@ -79,15 +80,16 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
         while temp_thousands - 1000 >= 0 and nominals["1000"] > 0:
             temp_thousands = temp_thousands - 1000
             xcept_dict["1000"] += 1
+            final_dict["1000"] += 1
             nominals["1000"] -= 1
         thousands = temp_thousands
     # if thousands != 0 and {"1000", 0}
-    fivehundreds = 0
+
     if thousands:
         temp_thousands = thousands
         while temp_thousands - 500 >= 0 and nominals["500"] > 0:
             temp_thousands = temp_thousands - 500
-            fivehundreds += 1
+            final_dict["500"] += 1
             nominals["500"] -= 1
         thousands = temp_thousands
     # if there're thousands still
@@ -108,6 +110,10 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
                     nominals[j] -= 1
             if temp_hundreds == 0:
                 hundreds = 0
+                for n in arr:
+                    if xcept_dict[n] > 0:
+                        final_dict[n] += xcept_dict[n]
+                        xcept_dict[n] = 0
                 ok = True
                 break
             else:
@@ -119,12 +125,11 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
             if ok:
                 break
 
-    fifties = 0
     if hundreds:
         temp_hundreds = hundreds
         while temp_hundreds - 50 >= 0 and nominals["50"] > 0:
             temp_hundreds = temp_hundreds - 50
-            fifties += 1
+            final_dict["50"] += 1
             nominals["50"] -= 1
         hundreds = temp_hundreds
     if hundreds:
@@ -144,6 +149,10 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
             if temp_tens == 0:
                 tens = 0
                 ok = True
+                for n in arr:
+                    if xcept_dict[n] > 0:
+                        final_dict[n] += xcept_dict[n]
+                        xcept_dict[n] = 0
                 break
             else:
                 for n in arr:
@@ -156,6 +165,15 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
     if not (tens or hundreds or thousands):
         with open(Path(__file__).parent.parent / "data" / "atm.data", "wt") as atm_nominal:
             atm_nominal.write(json.dumps(nominals))
+            print(f"{final_dict['10']} of nominal 10 ", end="\t")
+            print(f"{final_dict['20']} of nominal 20 ", end="\t")
+            print(f"{final_dict['50']} of nominal 50 ", end="\t")
+            print(f"{final_dict['100']} of nominal 100 ", end="\t")
+            print(f"{final_dict['200']} of nominal 200 ", end="\t")
+            print(f"{final_dict['500']} of nominal 500 ", end="\t")
+            print(f"{final_dict['1000']} of nominal 1000 ")
+
+
         return True
     else:
         for i in nominals.keys():
