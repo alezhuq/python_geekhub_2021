@@ -165,15 +165,21 @@ def im_trying_to_give_you_money(nominals: dict, value: int):
     if not (tens or hundreds or thousands):
         with open(Path(__file__).parent.parent / "data" / "atm.data", "wt") as atm_nominal:
             atm_nominal.write(json.dumps(nominals))
+        if final_dict['10']:
             print(f"{final_dict['10']} of nominal 10 ", end="\t")
+        if final_dict['20']:
             print(f"{final_dict['20']} of nominal 20 ", end="\t")
+        if final_dict['50']:
             print(f"{final_dict['50']} of nominal 50 ", end="\t")
+        if final_dict['100']:
             print(f"{final_dict['100']} of nominal 100 ", end="\t")
+        if final_dict['200']:
             print(f"{final_dict['200']} of nominal 200 ", end="\t")
+        if final_dict['500']:
             print(f"{final_dict['500']} of nominal 500 ", end="\t")
-            print(f"{final_dict['1000']} of nominal 1000 ")
-
-
+        if final_dict['1000']:
+            print(f"{final_dict['1000']} of nominal 1000 ", end="\t")
+        print("")
         return True
     else:
         for i in nominals.keys():
