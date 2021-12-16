@@ -145,8 +145,11 @@ def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
             if ok:
                 break
     if not (tens or hundreds or thousands):
+
         with con:
-            cur.execute("UPDATE atm SET atm_status = ?", (json.dumps(nominals),))
+            cur.execute('UPDATE atm SET "10" = ?, "20" = ?, "50" = ?, "100" = ?, "200" = ?, "500" = ?, "1000" = ?',
+                        tuple(i for i in nominals.values()))
+
         if final_dict['10']:
             print(f"{final_dict['10']} of nominal 10 ", end="\t")
         if final_dict['20']:
@@ -198,8 +201,9 @@ def money_out(username: str, amount: int, con, cur):
         print("can't perform the operation")
         return
     else:
-        nominals = json.loads(((cur.execute('SELECT * FROM atm').fetchone())[0]))
-
+        a = cur.execute("PRAGMA table_info(atm);").fetchall()
+        b = cur.execute("SELECT * FROM atm").fetchone()
+        nominals = {a[i][1]: b[i] for i in range(len(a))}
         if im_trying_to_give_you_money(nominals, amount, con, cur):
             transaction_dict = {datetime.now().strftime("%d/%m/%Y %H:%M:%S"): amount}
 
@@ -218,16 +222,21 @@ def money_out(username: str, amount: int, con, cur):
 
 
 def cash_out(con, cur):
-    nominals = json.loads(((cur.execute('SELECT * FROM atm').fetchone())[0]))
+    a = cur.execute("PRAGMA table_info(atm);").fetchall()
+    b = cur.execute("SELECT * FROM atm").fetchone()
+    nominals = {a[i][1]: b[i] for i in range(len(a))}
     for i in nominals.keys():
         nominals[i] = 0
     with con:
-        cur.execute("UPDATE atm SET atm_status = ?", (json.dumps(nominals),))
+        cur.execute('UPDATE atm SET "10" = ?, "20" = ?, "50" = ?, "100" = ?, "200" = ?, "500" = ?, "1000" = ?',
+                    tuple(i for i in nominals.values()))
     print("operation good")
 
 
 def cash_in(nominal: int, amount: int, con, cur):
-    nominals = json.loads(((cur.execute('SELECT * FROM atm').fetchone())[0]))
+    a = cur.execute("PRAGMA table_info(atm);").fetchall()
+    b = cur.execute("SELECT * FROM atm").fetchone()
+    nominals = {a[i][1]: b[i] for i in range(len(a))}
     if not (str(nominal) in nominals.keys()):
         print("i don't hold such type of nominal")
         return
@@ -237,7 +246,8 @@ def cash_in(nominal: int, amount: int, con, cur):
     else:
         nominals[str(nominal)] += amount
         with con:
-            cur.execute("UPDATE atm SET atm_status = ?", (json.dumps(nominals),))
+            cur.execute('UPDATE atm SET "10" = ?, "20" = ?, "50" = ?, "100" = ?, "200" = ?, "500" = ?, "1000" = ?',
+                        tuple(i for i in nominals.values()))
         print("operation good")
 
 
@@ -248,7 +258,9 @@ def view_balance(username: str, cur):
 
 
 def view_atm(cur):
-    nominals = json.loads(((cur.execute('SELECT * FROM atm').fetchone())[0]))
+    a = cur.execute("PRAGMA table_info(atm);").fetchall()
+    b = cur.execute("SELECT * FROM atm").fetchone()
+    nominals = {a[i][1]: b[i] for i in range(len(a))}
     print(nominals)
 
 
@@ -272,9 +284,16 @@ def start():
                                    balance INTEGER NOT NULL,
                                    FOREIGN KEY(user) references users(username)
                                    );"""
-    create_atm_table = """CREATE TABLE IF NOT EXISTS atm(atm_status BLOB);"""
 
-    # next : create transactions and balance tables for each user
+    create_atm_table = """CREATE TABLE IF NOT EXISTS atm(
+                          "10" INTEGER NOT NULL,
+                          "20" INTEGER NOT NULL,
+                          "50" INTEGER NOT NULL,
+                          "100" INTEGER NOT NULL,
+                          "200" INTEGER NOT NULL,
+                          "500" INTEGER NOT NULL,
+                          "1000" INTEGER NOT NULL
+                          );"""
 
     con = create_connection(Path(__file__).parent.parent / "data" / "users.db")
 
@@ -294,7 +313,6 @@ def start():
     for user in users_list:
         # check if user exist
         exist = cur.execute("SELECT rowid FROM users WHERE username = ?", (user[0],)).fetchone()
-        print(exist)
         if not exist:
             with con:
                 cur.execute("INSERT INTO users(username, password, is_incasator) VALUES (?,?,?)",
@@ -314,10 +332,11 @@ def start():
                             (user[0], balance_dict[user[0]]))
 
     exist = cur.execute("SELECT * FROM atm").fetchone()
+
     if not exist:
         with con:
-            cur.execute("INSERT INTO atm(atm_status) VALUES (?)", (json.dumps(atm_status),))
-
+            cur.execute('INSERT INTO atm("10", "20", "50", "100", "200", "500", "1000") VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        tuple((i for i in atm_status.values())))
 
         # now all tables are created
 
@@ -349,7 +368,7 @@ def start():
             flag = True
             while flag:
                 choice = int(input(
-                    '''Actions:\n1.view balance\n2. cash in\n3. cash out\n4. exit\n(example : 1) : '''
+                    '''Actions:\n1.view atm\n2. cash in\n3. cash out\n4. exit\n(example : 1) : '''
                 ))
                 if choice == 1:
                     view_atm(cur)
