@@ -10,7 +10,6 @@
 
 from pathlib import Path
 from datetime import datetime
-import json
 import sqlite3
 
 
@@ -82,7 +81,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
     if hundreds:
         counter = 0
         arr = [i for i in reversed(nominals.keys()) if int(i) // 100 and not int(i) // 1000]  # [500, 200, 100]
-        for i in arr:
+        for _ in arr:
             ok = False
             temp_hundreds = hundreds
             for j in arr[counter:]:  # counter 1 will eliminate "500" from arr in case of fail
@@ -120,7 +119,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
     if tens:
         counter = 0
         arr = [i for i in reversed(nominals.keys()) if int(i) // 10 and not int(i) // 100]  # [50, 20, 10]
-        for i in arr:
+        for _ in arr:
             ok = False
             temp_tens = tens
             for j in arr[counter:]:
@@ -182,7 +181,7 @@ def money_in(username: str, amount: int, con, cur):
     total_dinero = amount + int(balance)
     transaction_dict = {datetime.now().strftime("%d/%m/%Y %H:%M:%S"): amount}
     transaction_string = str(cur.execute("SELECT transactions FROM users_transactions WHERE user = ?",
-                                     (username,)).fetchone()[0])
+                                         (username,)).fetchone()[0])
     transaction_string += str(transaction_dict)
     with con:
         cur.execute("UPDATE users_balance SET balance = ? WHERE user = ?", (total_dinero, username))
@@ -197,7 +196,7 @@ def money_out(username: str, amount: int, con, cur):
     balance = cur.execute("SELECT balance FROM users_balance WHERE user = ?", (username,)).fetchone()[0]
     total_dinero = int(balance) - amount
 
-    if (total_dinero) < 0:
+    if total_dinero < 0:
         print("can't perform the operation")
         return
     else:
@@ -208,7 +207,7 @@ def money_out(username: str, amount: int, con, cur):
             transaction_dict = {datetime.now().strftime("%d/%m/%Y %H:%M:%S"): amount}
 
             transaction_string = str(cur.execute("SELECT transactions FROM users_transactions WHERE user = ?",
-                                             (username,)).fetchone()[0])
+                                                 (username,)).fetchone()[0])
             transaction_string += str(transaction_dict)
 
             with con:
