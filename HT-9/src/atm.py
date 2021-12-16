@@ -76,6 +76,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
     # if there're thousands still
     if thousands:
         hundreds += thousands
+        thousands = 0
 
     # if hundreds
     if hundreds:
@@ -115,6 +116,7 @@ def im_trying_to_give_you_money(nominals: dict, value: int, con, cur):
         hundreds = temp_hundreds
     if hundreds:
         tens += hundreds
+        hundreds = 0
 
     if tens:
         counter = 0
