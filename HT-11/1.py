@@ -74,18 +74,15 @@ def choose_user_id():
         return
     user = give_dict_user(placeholder_users, input_id)
     print(f"ID : {user.get('id')}\nName :{user.get('name')}\nNickname :{user.get('username')}", end="\n\n")
+    return input_id
 
 
-def usr():
+def usr(user_id):
     placeholder_users = 'https://jsonplaceholder.typicode.com/users'
 
     # 1. Повна інформація про користувача
-    try:
-        input_id = int(input("input your id : "))
-    except ValueError:
-        print("can't understand your id :(")
-        return
-    user = give_dict_user(placeholder_users, input_id)
+
+    user = give_dict_user(placeholder_users, user_id)
 
     print(f"ID : {user.get('id')}\nName :{user.get('name')}\nNickname : {user.get('username')}\n"
           f"address : {user['address'].get('street')} street, {user['address'].get('suite')}, "
@@ -99,15 +96,11 @@ def usr():
     # 2. Пости:
 
 
-def posts():
+def posts(input_id):
     placeholder_posts = 'https://jsonplaceholder.typicode.com/posts'
     placeholder_comments = 'https://jsonplaceholder.typicode.com/comments'
     posts = give_dict_request(placeholder_posts)
-    try:
-        input_id = int(input("input your user id to show all users post: "))
-    except ValueError:
-        print("can't understand your id :(")
-        return
+
 
     # перелік постів користувача (ID та заголовок)
     for post_info in posts:
@@ -135,21 +128,26 @@ def posts():
                   f"all comments id's : {comments_id_list}")
 
 
-def todo():
+def todo(input_id):
     #    3. ТУДУшка:
     placeholder_todos = 'https://jsonplaceholder.typicode.com/todos'
     todos = give_dict_request(placeholder_todos)
     completed_list = []
     unfinished_list = []
     for todo_dict in todos:
-        if todo_dict.get("completed") == True:
-            completed_list.append(todo_dict)
-        else:
-            unfinished_list.append(todo_dict)
-    print("completed tasks : ")
+        if todo_dict.get("userId") == input_id:
+            if todo_dict.get("completed"):
+                completed_list.append(todo_dict)
+            else:
+                unfinished_list.append(todo_dict)
+    print("\n**************\n"
+          "completed tasks"
+          "\n**************\n")
     for task in completed_list:
         print(f"id :{task.get('id')}, title : {task.get('title')}")
-
+    print("\n****************\n"
+          "unfinished tasks"
+          "\n****************\n")
     for task in unfinished_list:
         print(f"id :{task.get('id')}, title : {task.get('title')}")
 
@@ -166,7 +164,7 @@ def main():
     print("short info about users : ")
     users_brief_info()
     print("choose 1 user (1 to 10): ")
-    choose_user_id()
+    user_id = choose_user_id()
     ok = 1
     while ok:
         try:
@@ -177,11 +175,11 @@ def main():
             break
 
         if command == 1:
-            usr()
+            usr(user_id)
         elif command == 2:
-            posts()
+            posts(user_id)
         elif command == 3:
-            todo()
+            todo(user_id)
         elif command == 4:
             photo()
         else:
