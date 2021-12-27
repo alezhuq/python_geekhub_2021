@@ -55,18 +55,18 @@ def info_getter(soup, web_url, con, cur):
         all_tags_html = quote.find("meta", {"class": "keywords"})
         all_tags = all_tags_html.attrs["content"]
 
-        with open(Path(Path("__file__").parent / "out.csv"), "a") as out:
-            writer = csv.writer(out)
+        with open(Path(Path("__file__").parent / "out.csv"), "a", encoding='UTF8') as out:
+            writer = csv.writer(out, )
             writer.writerow(
                 [text_quote, author, author_info[9:-9], author_born_date, author_born_location[3:], all_tags])
         print([text_quote, author, author_info[9:-9], author_born_date, author_born_location[3:], all_tags])
         exist = cur.execute("SELECT rowid FROM quotes WHERE quote = ?", (text_quote,)).fetchone()
         if not exist:
             with con:
-                cur.execute("""INSERT INTO quotes(quote, author, author_info, author_born_date, author_born_location, tags)
-                            VALUES (?, ?, ?, ?, ?, ?)""",
-                            (text_quote, author, author_info[9:-9], author_born_date, author_born_location[3:], all_tags,))
-
+                cur.execute("""INSERT INTO quotes(quote, author, author_info, author_born_date, author_born_location, 
+                               tags) VALUES (?, ?, ?, ?, ?, ?)""",
+                            (text_quote, author, author_info[9:-9], author_born_date, author_born_location[3:],
+                             all_tags,))
 
     return "success"
 
@@ -83,7 +83,7 @@ def get_all_pages_info(con, cur):
         return
 
     soup = BeautifulSoup(request.text, "lxml")
-    info_getter(soup, web_url, con, cur)
+    result = info_getter(soup, web_url, con, cur)
 
     is_next_link = soup.find("li", {"class": "next"})
 
@@ -109,7 +109,7 @@ def get_all_pages_info(con, cur):
 
 
 def main():
-    with open(Path(Path("__file__").parent / "out.csv"), "w") as out:
+    with open(Path(Path("__file__").parent / "out.csv"), "w", encoding='UTF8') as out:
         writer = csv.writer(out)
         writer.writerow(["quote", "author", "author_info", "author_born_date", "author_born_location", "tags"])
 
