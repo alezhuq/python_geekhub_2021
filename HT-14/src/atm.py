@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime
 import sqlite3
 import requests
+from abc import ABC, abstractmethod
 
 
 def pretty_print(func):
@@ -16,18 +17,21 @@ def pretty_print(func):
     return wrapper
 
 
-class Person(object):
+class Person(ABC):
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
 
+    @abstractmethod
     def view_balance(self):
         return NotImplemented
 
+    @abstractmethod
     def money_in(self, amount, conector):
         return NotImplemented
 
+    @abstractmethod
     def money_out(self, amount, conector):
         return NotImplemented
 
@@ -326,29 +330,33 @@ class DataBaseConnector(object):
             exit(1)
         self.cur = self.con.cursor()
 
-
-def start():
-    # main function, runs all mentioned above
-
-    create_user_table = """ CREATE TABLE IF NOT EXISTS users (
+    def create_user_tb(self):
+        with self.con:
+            self.cur.execute(""" CREATE TABLE IF NOT EXISTS users (
                             username TEXT PRIMARY KEY NOT NULL,
                             password TEXT NOT NULL,
                             is_incasator INTEGER NOT NULL DEFAULT FALSE
-                            ); """
+                            ); """)
 
-    create_user_transactions_table = """CREATE TABLE IF NOT EXISTS users_transactions(
+    def create_user_transactions_tb(self):
+        with self.con:
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS users_transactions(
                                         user TEXT NOT NULL,
                                         transactions BLOB,
                                         FOREIGN KEY(user) references users(username)
-                                        );"""
+                                        );""")
 
-    create_user_balance_table = """CREATE TABLE IF NOT EXISTS users_balance(
+    def create_user_balance_tb(self):
+        with self.con:
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS users_balance(
                                    user TEXT NOT NULL,
                                    balance INTEGER NOT NULL,
                                    FOREIGN KEY(user) references users(username)
-                                   );"""
+                                   );""")
 
-    create_atm_table = """CREATE TABLE IF NOT EXISTS atm(
+    def create_atm_tb(self):
+        with self.con:
+            self.cur.execute("""CREATE TABLE IF NOT EXISTS atm(
                           "10" INTEGER NOT NULL,
                           "20" INTEGER NOT NULL,
                           "50" INTEGER NOT NULL,
@@ -356,15 +364,49 @@ def start():
                           "200" INTEGER NOT NULL,
                           "500" INTEGER NOT NULL,
                           "1000" INTEGER NOT NULL
-                          );"""
+                          );""")
+
+    def fill_up_db(self, users_list, atm_status, balance_dict):
+        for user in users_list:
+            # check if user exist
+            exist = self.cur.execute("SELECT rowid FROM users WHERE username = ?", (user.username,)).fetchone()
+            if not exist:
+                with self.con:
+                    self.cur.execute("INSERT INTO users(username, password, is_incasator) VALUES (?,?,?)",
+                                     (user.username, user.password, isinstance(user, Incasator),))
+            # check if balance exist
+            exist = self.cur.execute(f"SELECT rowid FROM users_balance WHERE user = ?", (user.username,)).fetchone()
+            if not exist:
+                with self.con:
+                    self.cur.execute("INSERT INTO users_balance(user, balance) VALUES (?,?)",
+                                     (user.username, balance_dict[user.username]))
+
+            # check if transactions exist
+            exist = self.cur.execute(f"SELECT rowid FROM users_transactions WHERE user = ?",
+                                     (user.username,)).fetchone()
+            if not exist:
+                with self.con:
+                    self.cur.execute("INSERT INTO users_transactions(user, transactions) VALUES (?,?)",
+                                     (user.username, balance_dict[user.username]))
+
+        exist = self.cur.execute("SELECT * FROM atm").fetchone()
+        if not exist:
+            with self.con:
+                self.cur.execute(
+                    'INSERT INTO atm("10", "20", "50", "100", "200", "500", "1000") VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    tuple((i for i in atm_status.values())))
+
+
+def start():
+    # main function, runs all mentioned above
 
     conector = DataBaseConnector(Path(__file__).parent.parent / "data" / "users.db")
 
     with conector.con:
-        conector.cur.execute(create_user_table)
-        conector.cur.execute(create_user_transactions_table)
-        conector.cur.execute(create_user_balance_table)
-        conector.cur.execute(create_atm_table)
+        conector.create_user_tb()
+        conector.create_user_balance_tb()
+        conector.create_user_transactions_tb()
+        conector.create_atm_tb()
 
     users_info_list = [["user1", "user1", 0],
                        ["user2", "user2", 0],
@@ -379,37 +421,10 @@ def start():
 
     atm_status = {"10": 0, "20": 62, "50": 16, "100": 0, "200": 15, "500": 10, "1000": 0}
     balance_dict = {"user1": 1237, "user2": 909, "admin": 999999}
-    for user in users_list:
-        # check if user exist
-        exist = conector.cur.execute("SELECT rowid FROM users WHERE username = ?", (user.username,)).fetchone()
-        if not exist:
-            with conector.con:
-                conector.cur.execute("INSERT INTO users(username, password, is_incasator) VALUES (?,?,?)",
-                                     (user.username, user.password, isinstance(user, Incasator),))
-        # check if balance exist
-        exist = conector.cur.execute(f"SELECT rowid FROM users_balance WHERE user = ?", (user.username,)).fetchone()
-        if not exist:
-            with conector.con:
-                conector.cur.execute("INSERT INTO users_balance(user, balance) VALUES (?,?)",
-                                     (user.username, balance_dict[user.username]))
 
-        # check if transactions exist
-        exist = conector.cur.execute(f"SELECT rowid FROM users_transactions WHERE user = ?",
-                                     (user.username,)).fetchone()
-        if not exist:
-            with conector.con:
-                conector.cur.execute("INSERT INTO users_transactions(user, transactions) VALUES (?,?)",
-                                     (user.username, balance_dict[user.username]))
+    conector.fill_up_db(users_list, atm_status, balance_dict)
 
-    exist = conector.cur.execute("SELECT * FROM atm").fetchone()
-
-    if not exist:
-        with conector.con:
-            conector.cur.execute(
-                'INSERT INTO atm("10", "20", "50", "100", "200", "500", "1000") VALUES (?, ?, ?, ?, ?, ?, ?)',
-                tuple((i for i in atm_status.values())))
-
-        # now all tables are created
+    # now all tables are created
 
     ok = True
     user_show_actions = '''Actions:
@@ -420,7 +435,6 @@ def start():
     0. exit\n(example : 1) : '''
     while ok:
         username, password = input("enter your username and password(ex.:antoxaMC mypasswrd) : ").split(sep=" ")
-        temp_person = Person(username, password)
         valid_person = Person.validation(username, password, conector)
         if not valid_person:
             print("bad username or password")
