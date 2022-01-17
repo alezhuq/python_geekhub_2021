@@ -99,6 +99,24 @@ class VikkaSpider(scrapy.Spider):
                 }
             )
 
+        #checking if ther is pagination
+        next_page = soup.select_one("#primary > nav")
+
+        if next_page:
+            link = next_page.select_one(".next.page-numbers").get("href")
+            print("-"*40)
+            print(link)
+            print("-"*40)
+            yield scrapy.Request(
+                url=link,
+                callback=self.parse_news,
+                meta={
+                    "year": response.meta["year"],
+                    "month": response.meta["month"],
+                    "day": response.meta["day"],
+                }
+            )
+
     def parse_news_text_and_write(self, response, **kwargs):
 
         soup = BeautifulSoup(response.text, "lxml")
