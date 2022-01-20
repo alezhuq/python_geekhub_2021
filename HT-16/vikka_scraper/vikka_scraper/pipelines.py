@@ -37,8 +37,8 @@ class VikkaScraperPipeline:
                     self.cur.execute("""INSERT INTO news (news_title_text, date, full_text, tags_string, news_url)
                     VALUES(?, ?, ?, ?, ?)""",
                                      (
-                                         item["date"],
                                          item["news_title_text"],
+                                         item["date"],
                                          item["full_text"],
                                          item["tags_string"],
                                          item["news_url"],
