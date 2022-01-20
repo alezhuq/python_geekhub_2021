@@ -110,8 +110,6 @@ class VikkaSpider(scrapy.Spider):
 
         name_of_file = f"{response.meta['year']}{response.meta['month']}{response.meta['day']}"
 
-        list_to_write = [response.meta["news_title_text"], full_text, tags_string, response.meta["news_url"]]
-
         item = VikkaScraperItem()
 
         item["date"] = name_of_file
@@ -119,10 +117,5 @@ class VikkaSpider(scrapy.Spider):
         item["full_text"] = full_text
         item["tags_string"] = tags_string
         item["news_url"] = response.meta["news_url"]
-
-        # opening file and adding info
-        # with open(Path(Path("__name__").parent.parent.parent / name_of_file), "a") as file:
-        #     writer = csv.writer(file)
-        #     writer.writerow(list_to_write)
 
         yield item
