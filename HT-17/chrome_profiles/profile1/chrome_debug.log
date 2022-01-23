@@ -1,0 +1,7 @@
+[7638:7638:0123/111807.367567:ERROR:viz_main_impl.cc(161)] Exiting GPU process due to errors during initialization
+[7697:7697:0123/111807.433469:ERROR:sandbox_linux.cc(378)] InitializeSandbox() called with multiple threads in process gpu-process.
+[7596:7688:0123/111813.096070:ERROR:chrome_browser_main_extra_parts_metrics.cc(227)] START: ReportBluetoothAvailability(). If you don't see the END: message, this is crbug.com/1216328.
+[7596:7688:0123/111813.096256:ERROR:chrome_browser_main_extra_parts_metrics.cc(230)] END: ReportBluetoothAvailability()
+[7639:7652:0123/111824.211754:WARNING:sqlite_persistent_store_backend_base.cc(171)] Failed to post task from FlushAndNotifyInBackground@net/extras/sqlite/sqlite_persistent_store_backend_base.cc:219 to client_task_runner_.
+[7639:7652:0123/111824.211863:WARNING:sqlite_persistent_store_backend_base.cc(171)] Failed to post task from FlushAndNotifyInBackground@net/extras/sqlite/sqlite_persistent_store_backend_base.cc:219 to client_task_runner_.
+[7596:7596:0123/111824.235419:WARNING:pref_notifier_impl.cc(40)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
