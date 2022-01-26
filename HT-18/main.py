@@ -18,6 +18,7 @@
 # Код повинен притримуватися стандарту pep8.
 
 import csv
+import sys
 
 from pathlib import Path
 from time import sleep
@@ -25,21 +26,20 @@ from time import sleep
 import requests
 
 
-def category_getter():
+def category_getter(usr_input):
     list_of_allowed_categories = [
         "askstories",
         "showstories",
         "newstories",
         "jobstories"
     ]
-    print("supported categories :\n", list_of_allowed_categories)
-    category = input("input your category : ")
+
 
     res = None
 
-    if category in list_of_allowed_categories:
-        res = category
-    elif category == "":
+    if usr_input in list_of_allowed_categories:
+        res = usr_input
+    elif usr_input == "":
         print("setting category to default(newstories)")
         res = "newstories"
     return res
@@ -102,16 +102,19 @@ def get_items_and_write_csv(id_list, base_url):
         print("current item : ", temp_item)
 
 
-def start():
+def start(usr_category):
     base_url = "https://hacker-news.firebaseio.com/v0/"
-    user_category = category_getter()
+    user_valid_category = category_getter(usr_category)
 
-    print(user_category)
 
-    id_list = get_all_ids(user_category, base_url)
+    id_list = get_all_ids(user_valid_category, base_url)
     if id_list:
         get_items_and_write_csv(id_list, base_url)
 
 
 if __name__ == "__main__":
-    start()
+    try:
+        usr_input = str(sys.argv[1])
+    except IndexError:
+        usr_input = ""
+    start(usr_input)
