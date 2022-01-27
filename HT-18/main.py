@@ -137,6 +137,9 @@ def category_getter(usr_input):
     elif usr_input == "":
         print("setting category to default(newstories)")
         res = "newstories"
+    else:
+        print("no such category")
+        sys.exit(1)
     return res
 
 
