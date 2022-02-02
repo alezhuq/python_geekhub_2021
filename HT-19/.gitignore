@@ -2,3 +2,5 @@
 venv
 1/app/local_settings.py
 2/app/local_settings.py
+1/db.sqlite3
+2/db.sqlite3

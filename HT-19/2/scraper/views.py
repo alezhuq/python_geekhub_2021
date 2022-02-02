@@ -58,7 +58,7 @@ def parse_ids(category):
 
 def get_items(category, id_list):
     data_format = ".json"
-    temp_url = "https://hacker-news.firebaseio.com/v0/" + "item/"
+    temp_url = "https://hacker-news.firebaseio.com/v0/item/"
     if category == "askstories":
         all_query = Ask.objects.all()
     elif category == "showsotires":
