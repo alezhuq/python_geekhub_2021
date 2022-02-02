@@ -16,18 +16,13 @@ class CreateMyChoiceView(CreateView):
     success_url = 'scraper/success.html'
 
     def post(self, request):
-
         form = MyChoiceForm(request.POST)
 
         if form.is_valid():
-
             user_category = form.cleaned_data['name']
 
             id_list = parse_ids(user_category)
             get_items(user_category, id_list)
-
-
-            # MY CODE HERE
 
             context = {
                 'form': MyChoiceForm(),
@@ -60,12 +55,22 @@ def parse_ids(category):
 
     return request.json()
 
-def get_items(category, id_list):
 
+def get_items(category, id_list):
     data_format = ".json"
     temp_url = "https://hacker-news.firebaseio.com/v0/" + "item/"
-
+    if category == "askstories":
+        all_query = Ask.objects.all()
+    elif category == "showsotires":
+        all_query = Show.objects.all()
+    elif category == "jobstories":
+        all_query = Job.objects.all()
+    else:
+        all_query = New.objects.all()
     for element in id_list:
+        if all_query.filter(item_id=int(element)).exists():
+            print("already in db")
+            continue
         try:
             request = requests.get(temp_url + str(element) + data_format)
             request.raise_for_status()
@@ -75,9 +80,6 @@ def get_items(category, id_list):
             return
         temp_item = request.json()
         if category == "askstories":
-            if Ask.objects.filter(item_id = int(temp_item.get("id", "None"))).exists():
-                print("already in db")
-                continue
             object_to_write = Ask(
                 by=temp_item.get("by", "None"),
                 descendants=temp_item.get("descendants", "None"),
@@ -90,9 +92,6 @@ def get_items(category, id_list):
                 item_type=temp_item.get("type", "None")
             )
         elif category == "showsotires":
-            if Show.objects.filter(item_id = int(temp_item.get("id", "None"))).exists():
-                print("already in db")
-                continue
             object_to_write = Show(
                 by=temp_item.get("by", "None"),
                 descendants=temp_item.get("descendants", "None"),
@@ -105,9 +104,6 @@ def get_items(category, id_list):
                 item_type=temp_item.get("type", "None")
             )
         elif category == "jobstories":
-            if Job.objects.filter(item_id = int(temp_item.get("id", "None"))).exists():
-                print("already in db")
-                continue
             object_to_write = Job(
                 by=temp_item.get("by", "None"),
                 item_id=temp_item.get("id", "None"),
@@ -118,9 +114,6 @@ def get_items(category, id_list):
                 item_type=temp_item.get("type", "None")
             )
         else:
-            if New.objects.filter(item_id = int(temp_item.get("id", "None"))).exists():
-                print("already in db")
-                continue
             object_to_write = New(
                 by=temp_item.get("by", "None"),
                 descendants=temp_item.get("descendants", "None"),
@@ -136,4 +129,3 @@ def get_items(category, id_list):
 
         print("current item : ", temp_item)
         object_to_write.save()
-
