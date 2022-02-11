@@ -5,6 +5,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 from .forms import UserForm
 # Create your views here.
 from .models import Item, Category, ShopUser
+from django.contrib.auth.models import User
 
 
 # from django.contrib.auth.models import User
@@ -20,7 +21,7 @@ class ItemView(ListView):
 
 
 class CreateUserForm(CreateView):
-    model = ShopUser
+    model = User
     form_class = UserForm
     template_name = "shop/login.html"
     success_url = "shop/main.html"
@@ -30,7 +31,7 @@ class CreateUserForm(CreateView):
         if form.is_valid():
             uname, passwd = form.cleaned_data["username"], form.cleaned_data["password"]
 
-            login_user = ShopUser.objects.all()
+            login_user = User.objects.all()
 
             print(uname, passwd)
 
@@ -60,6 +61,7 @@ class CreateUserForm(CreateView):
         categories = CategoryView.queryset
 
         context = {
+            'form': UserForm(request.POST),
             "user": None,
             "items": items,
             "categories": categories
@@ -72,7 +74,7 @@ def main_page(request):
     categories = CategoryView()
 
     try:
-        user = ShopUser.objects.all().filter(username=request.POST.get("username", None)).get()
+        user = User.objects.all().filter(username=request.POST.get("username", None)).get()
     except ObjectDoesNotExist:
         user = None
     context = {
