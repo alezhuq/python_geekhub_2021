@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+  <style>
+  body {
+       margin: 0;
+       padding: 0;
+       background-color:#6abadeba;
+       font-family: 'Arial';
+   }
+   .informationField{
+        color: red;
+   }
+   .login{
+           width: 382px;
+            overflow: hidden;
+            margin: auto;
+            margin: 20 0 0 450px;
+            padding: 80px;
+            background: #23463f;
+            border-radius: 15px;
+    }
+    h2{
+        text-align: center;
+        color: #277582;
+        padding: 20px;
+    }
+    p{
+        color: #08ffd1;
+        font-size: 17px;
+        text-align: center;
+    }
+    #Uname{
+        width: 300px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+
+    }
+    #Pass{
+        width: 300px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+
+    }
+    #log{
+        width: 300px;
+        height: 30px;
+        border: none;
+        border-radius: 17px;
+        padding-left: 7px;
+        color: blue;
+        margin: 0 0 40px 45px;
+    }
+    span{
+        color: white;
+        font-size: 17px;
+    }
+    a{
+        text-allign: center;
+        padding-right: 9px;
+    }
+  </style>
+</head>
+<body>
+<h2>Login Page</h2>
+  {% if error_message %}<p class="informationField"><strong>{{ error_message }}</strong></p>{% endif %}
+  <div class ='login'>
+  <form class = "loginForm"  method = "post" action="{% url 'shop:login' %}">
+    {% csrf_token %}
+      <div class="form-row">
+        {{ form.username.errors }}
+        <a class="Uname">{{ form.username.label_tag }} {{ form.username }}</a>
+      </div>
+      <div class="form-row">
+        {{ form.password.errors }}
+        <a class="Pass">{{ form.password.label_tag }} {{ form.password }}</a>
+      </div>
+    <button type="submit" value="submit" id = "log">
+      Log In
+    </button>
+  </form>
+  </div>
+</body>
+</html>
